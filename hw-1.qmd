@@ -1,5 +1,5 @@
 ---
-title: "HW 1"
+title: "STA 313 - Spring 2024 - HW 1"
 subtitle: "Viz dat, wrangle dis!"
 author: "INSERT YOUR NAME HERE"
 format:
