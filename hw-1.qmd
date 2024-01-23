@@ -1,5 +1,6 @@
 ---
-title: "HW 01"
+title: "HW 1"
+subtitle: "Viz dat, wrangle dis!"
 author: "INSERT YOUR NAME HERE"
 format:
   html:
