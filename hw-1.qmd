@@ -1,7 +1,7 @@
 ---
 title: "STA 313 - Spring 2024 - HW 1"
 subtitle: "Viz dat, wrangle dis!"
-author: "INSERT YOUR NAME HERE"
+author: "Sana Pashankar"
 format:
   html:
     embed-resources: true
@@ -14,20 +14,84 @@ toc: true
 
 library(tidyverse)
 library(openintro)
+library(scales)
+data("nyc_marathon")
 # add other packages as needed or remove comment
 ```
 
 ## 1 - NYC marathon winners.
 
 ```{r}
-#| label: label-me-1
+#| label: nyc marathon histogram
+
+#a. Create a histogram and a box plot of the distribution of marathon times of all runners in the dataset. What features of the distribution are apparent in the histogram and not the box plot? What features are apparent in the box plot but not in the histogram?
+
+nyc_marathon <- nyc_marathon %>%
+  filter(!is.na(time_hrs)) 
+
+ggplot(nyc_marathon, aes(x = time_hrs)) + 
+  geom_histogram(binwidth = 0.05, fill = "skyblue4") + 
+  labs(x = "Finishing time (hours)", y = "Number of Runners", 
+       title = "Distribution of Finishing Times for the NYC Marathon") +
+   theme_minimal() 
 
 ```
+```{r}
+ggplot(nyc_marathon, aes(x = time_hrs)) + 
+  geom_boxplot() + 
+  labs(x = "Finishing time (hours)", y = "Proportion of runners", 
+       title = "Distribution of Finishing Times for the NYC Marathon") +
+   theme_minimal() 
+
+```
+
+
+In the histogram, you can see the number of runners who achieved a similar finishing time, whereas in the box plot you can see the proportion of runners who achieved a similar finishing time. The boxplot more clearly identifies a set range of finishing time and the average time of the runners. The histogram more clearly identifies how many runners achieved a specific time.  
+
+```{r}
+#b.Create a side-by-side box plots of marathon times for men and women. Use different colors for the each of the box plots – do not use the default colors, but instead manually define them (you can choose any two colors you want). Based on the plots you made, compare the distribution of marathon times for men and women.
+
+ggplot(nyc_marathon, aes(x = time_hrs, color = division)) + 
+  geom_boxplot() + 
+  labs(x = "Finishing time (hours)", y = "Proportion of runners", 
+       title = "Distribution of Finishing Times for the NYC Marathon", 
+       color = "Division") +
+   theme_minimal() + 
+  scale_color_manual(values = c("skyblue", "magenta"))
+
+```
+
+```{r}
+#d. d. Visualize the marathon times of men and women over the years. As is usual with time series plot, year should go on the x-axis. Use different colors and shapes to represent the times for men and women. Make sure your colors match those in the previous part. Once you have your plot, describe what is visible in this plot but not in the others.
+
+nyc_marathon_years <- nyc_marathon %>%
+  group_by(year, division) %>%
+  summarize(
+    mean = mean(time_hrs)
+  )
+
+ggplot(nyc_marathon_years, aes(x = year, y = mean, color = division)) + 
+  geom_line() + 
+  geom_point(aes(color = division, shape = division)) + 
+  scale_shape_manual(values = c("circle", "square")) + 
+  scale_color_manual(values = c("skyblue", "magenta")) + 
+  theme_minimal() +
+  labs(x = "Year", y = "Average Finishing Time (hours)", 
+       title = "Average Finishing Times for the NYC Marathon Over Time", 
+       color = "Division", 
+       shape = NA) + 
+  guides(color = guide_legend("Division"), shape = guide_legend("Division"))
+
+```
+
+In this plot, you can see how the average finishing times of men and women has fluctuated over the years. You can see how the finishing times have decreased over time and how they have changed based on global events (COVID-19 in 2020). 
+
 
 ## 2 - US counties.
 
 ```{r}
 #| label: label-me-2
+
 
 ```
 
