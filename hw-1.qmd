@@ -90,9 +90,87 @@ In this plot, you can see how the average finishing times of men and women has f
 ## 2 - US counties.
 
 ```{r}
-#| label: label-me-2
+#| label: county-data-plot-a
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership,
+                                                     y = poverty)) +
+  geom_point() + 
+  labs(title = "Plot A", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+```{r}
+#| label: county-data-plot-b
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership,
+                                                     y = poverty)) +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  labs(title = "Plot B", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+```{r}
+#| label: county-data-plot-c
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty)) +
+  geom_point() + 
+  geom_smooth(aes(group = metro), color = "green", se = FALSE) +
+  labs(title = "Plot C", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+```{r}
+#| label: county-data-plot-d
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty)) +
+  geom_smooth(aes(group = metro), color = "blue", se = FALSE) +
+  geom_point() + 
+  labs(title = "Plot D", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
 
 
+```{r}
+#| label: county-data-plot-e
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty, color = metro)) +
+  geom_point() +
+  geom_smooth(aes(linetype = metro), color = "blue", se = FALSE) +
+  labs(title = "Plot E", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+
+```{r}
+#| label: county-data-plot-f
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty, color = metro)) +
+  geom_point() +
+  geom_smooth(aes(color = metro), se = FALSE) +
+  labs(title = "Plot F", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+
+```{r}
+#| label: county-data-plot-g
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty)) +
+  geom_point(aes(color = metro)) +
+  geom_smooth(se = FALSE) +
+  labs(title = "Plot G", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
+```
+```{r}
+#| label: county-data-plot-H
+
+ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty)) +
+  geom_point(aes(color = metro)) +
+  labs(title = "Plot H", 
+       x = "Home ownership rate", 
+       y = "Percent of population in poverty")
 ```
 
 ## 3 - Credit card balances.
@@ -105,7 +183,18 @@ credit <- read_csv("data/credit.csv")
 ```
 
 ```{r}
-#| label: label-me-3
+#| label: label-me-credit-facet
+
+ggplot(credit, aes(x = income, y = balance)) +
+  geom_point(aes(shape = student, color = student), alpha = 0.7) + 
+  geom_smooth(aes(color = student), se = FALSE, method = "lm") + 
+  facet_grid(rows = vars(student), cols = vars(married), labeller = label_both) +
+  scale_y_continuous(labels = label_dollar(big.mark = ",")) +
+  scale_x_continuous(labels = label_dollar(big.mark = ",", suffix = "K")) + 
+  labs(x = "Income", 
+       y = "Credit Card Balance") + 
+  theme(legend.position = "none")
+  
 
 ```
 
