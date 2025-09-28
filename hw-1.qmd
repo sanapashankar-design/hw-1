@@ -15,6 +15,10 @@ toc: true
 library(tidyverse)
 library(openintro)
 library(scales)
+library(ggforce)
+library(ggrepel)
+library(gridExtra)
+library(grid)
 data("nyc_marathon")
 # add other packages as needed or remove comment
 ```
@@ -164,7 +168,7 @@ ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = pove
        y = "Percent of population in poverty")
 ```
 ```{r}
-#| label: county-data-plot-H
+#| label: county-data-plot-h
 
 ggplot(county %>% filter(!is.na(homeownership)), aes(x = homeownership, y = poverty)) +
   geom_point(aes(color = metro)) +
@@ -183,7 +187,7 @@ credit <- read_csv("data/credit.csv")
 ```
 
 ```{r}
-#| label: label-me-credit-facet
+#| label: credit-plot-1
 
 ggplot(credit, aes(x = income, y = balance)) +
   geom_point(aes(shape = student, color = student), alpha = 0.7) + 
@@ -198,12 +202,62 @@ ggplot(credit, aes(x = income, y = balance)) +
 
 ```
 
-## 4 - Expect More. Plot More.
-
 ```{r}
-#| label: label-me-4
+#| label: credit-plot-2
+
+credit <- credit %>%
+  mutate(utilization = (balance/limit) * 100)
+
+
+ggplot(credit, aes(x = income, y = utilization)) +
+  geom_point(aes(shape = student, color = student), alpha = 0.7) + 
+  geom_smooth(aes(color = student), se = FALSE, method = "lm") + 
+  facet_grid(rows = vars(student), cols = vars(married), labeller = label_both) +
+  scale_y_continuous(labels = label_number(suffix = "%")) +
+  scale_x_continuous(labels = label_dollar(big.mark = ",", suffix = "K")) + 
+  labs(x = "Income", 
+       y = "Credit Utilization") + 
+  theme(legend.position = "none")
+
+
 
 ```
+
+## 4 - Expect More. Plot More.
+
+  
+```{r}
+#l label: target-plot
+# Example data
+circles <- tibble(
+  x0 = 0, y0 = 0,
+  r   = 3,
+)
+circles2 <- tibble(
+  x0 = 0, y0 = 0,
+  r   = 2,
+)
+circles3 <- tibble(
+  x0 = 0, y0 = 0,
+  r   = 1,
+  fill = "#E4002B"  # Target red hex + white
+)
+
+ggplot() +
+  geom_circle(data = circles, aes(x0=x0, y0=y0, r=r),
+              fill = "#E4002B", color = NA) +
+  geom_circle(data = circles2, aes(x0=x0, y0=y0, r=r),
+              fill = "white", color = NA) +
+  geom_circle(data = circles3, aes(x0=x0, y0=y0, r=r),
+              fill = "#E4002B", color = NA) +
+  coord_fixed() +
+  theme_void() +
+  annotate("text", x = 0, y = -3.6, label = "TARGET",
+           fontface = "bold", size = 12, color = "#E4002B")
+
+
+```
+
 
 ## 5 - Napoleon’s march.
 
@@ -211,9 +265,62 @@ ggplot(credit, aes(x = income, y = balance)) +
 #| label: load-napoleon-data
 
 napoleon <- read_rds("data/napoleon.rds")
+troops <- napoleon$troops
+temp <- napoleon$temperatures 
+cities <- napoleon$cities
+
+#city_troops <- merge(x = napoleon$cities, y = napoleon$troops, by = c("long", "lat"), all = TRUE)
+#napoleon_march <- merge(x = city_troops, y = napoleon$temperatures, by = "long", all = TRUE)
+
+ggplot() +
+  geom_path(data = troops, aes(x = long, y = lat, group = group, color = direction, size = survivors), lineend = "round") +
+  geom_point(data = cities, aes(x = long, y = lat)) + 
+  geom_text(data = cities, aes(x = long, y = lat, label = city), vjust = 1.5) +
+  scale_size("Survivors", range = c(1, 10)) + 
+  theme(legend.position = "none")
 ```
 
 ```{r}
-#| label: label-me-5
+plot_troops_cities <- last_plot()
+
+temp <- temp %>%
+  mutate(temp_label = if_else(!is.na(temp), paste0(temp, "° ", date), ""))
+```
+
+```{r}
+ggplot(temp, aes(x = long, y = temp)) + 
+  geom_point() +
+  geom_path() + 
+  geom_text_repel(aes(label = temp_label), size = 3, vjust = -1)
+```
+
+```{r}
+plot_temp<- last_plot()
+grid.arrange(plot_troops_cities, plot_temp)
+```
+
+
+```{r}
+plot_troops_cities + 
+  coord_cartesian(xlim = c(24,38)) + 
+  labs(x = NA, y = NA) + 
+  guides(color = FALSE, size = FALSE) +
+  theme_void()
+
+plot_troops_cities_fixed <- last_plot()
 
 ```
+
+```{r}
+plot_temp + 
+  coord_cartesian(xlim = c(24,38)) + 
+  labs(x = NA, y = NA) + 
+  theme_void() 
+
+plot_temp_fixed <- last_plot()
+```
+```{r}
+grid.arrange(plot_troops_cities_fixed, plot_temp_fixed, nrow=2, heights=c(6, 1.2))
+grid.rect(width = .99, height = .99, gp = gpar(lwd = 2, col = "gray", fill = NA))
+```
+
